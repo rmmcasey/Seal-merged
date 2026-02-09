@@ -6,7 +6,8 @@
   "permissions": [
     "storage",
     "activeTab",
-    "cookies"
+    "cookies",
+    "downloads"
   ],
   "host_permissions": [
     "https://mail.google.com/*",

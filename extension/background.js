@@ -221,6 +221,42 @@ const messageHandlers = {
   },
 
   /**
+   * Login with email/password directly from the extension.
+   * Calls the /api/auth/login endpoint and stores the token.
+   */
+  async loginWithCredentials(request) {
+    const { email, password } = request;
+    if (!email || !password) {
+      return { authenticated: false, error: 'Email and password are required' };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.authenticated) {
+        return { authenticated: false, error: data.error || 'Login failed' };
+      }
+
+      // Store the token and email
+      await storeAuth(data.token, data.email);
+
+      return {
+        authenticated: true,
+        email: data.email
+      };
+    } catch (err) {
+      console.error('[Seal] Extension login failed:', err);
+      return { authenticated: false, error: err.message };
+    }
+  },
+
+  /**
    * Logout: clear stored credentials
    */
   async logout() {
